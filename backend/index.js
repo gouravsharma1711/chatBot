@@ -1,29 +1,6 @@
-const express = require('express');
-const app = express();
-const cors = require('cors')
+const app = require('./src/App.js');
+require('./src/utils/LLM.js');
 
-console.log("NODE_ENVIRONMENT : ",process.env.NODE_ENVIRONMENT);
-
-
-// middlewares
-app.use(cors())
-app.use(express.json());
-
-
-
-app.get('/testing',(req,res)=>{
-    res.json({
-        message:"Testing Successfull"
-    })
-})
-
-app.post('/chat',(req,res)=>{
-    const {msg} = req.body; 
-
-
-
-
-})
 
 const port = process.env.PORT
 app.listen(port,()=>{
