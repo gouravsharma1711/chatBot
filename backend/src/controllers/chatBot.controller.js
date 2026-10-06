@@ -29,7 +29,7 @@ const chatBotChatsController = async(req,res)=>{
             success:false,
             message:error.message || "Internal Server Error",
             aiResponse:"",
-            stack:error.stack
+            stack: process.env.NODE_ENVIRONMENT === "development"? error.stack : undefined
         })   
     }
 }
