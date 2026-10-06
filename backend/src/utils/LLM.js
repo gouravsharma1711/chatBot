@@ -69,12 +69,11 @@ const systemPrompt = {
     }
 
 
-const messages = [
-    systemPrompt
-];
-
 
 async function LLMCalling(userQuery) {
+    const messages = [
+        systemPrompt
+    ];
 
     messages.push({
         role: "user",

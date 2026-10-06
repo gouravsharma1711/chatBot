@@ -9,10 +9,10 @@ const testingController = (req,res)=>{
 
 
 const chatBotChatsController = async(req,res)=>{
+    
     const {userMessage} = req.body;
 
     const response = await LLMCalling(userMessage);
-    console.log("Mere Response hai  : ",response);
     
 
     res.status(200).json({
