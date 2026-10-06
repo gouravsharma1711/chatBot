@@ -8,8 +8,13 @@ const chatBotRoutes = require('./routes/chatBot.routes.js');
 // middlewares
 app.use(express.json());
 app.use(cors({
-    origin:process.env.FRONTEND_URL
+    origin:process.env.FRONTEND_URL,
+    credentials:true
 }));
+
+console.log("env  : ",process.env.FRONTEND_URL);
+
+
 app.use('/api/v1/',chatBotRoutes);
 
 
