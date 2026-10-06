@@ -1,17 +1,16 @@
 const Groq = require("groq-sdk");
-const {webSearchTool} = require('../tools/webSearchTool.js');
+const { webSearchTool } = require("../tools/webSearchTool.js");
 const toolCalling = require("./toolCalling.js");
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API,
 });
 
-
 // System Prompt
 
 const systemPrompt = {
-    role: "system",
-    content: `
+  role: "system",
+  content: `
         You're Quantum bot .You are a smart personal assistant.
 
         IMPORTANT TOOL RULE:
@@ -65,54 +64,53 @@ const systemPrompt = {
 
         current date and time : ${new Date().toUTCString()}
         `,
-
-    }
-
-
+};
 
 async function LLMCalling(userQuery) {
-    const messages = [
-        systemPrompt
-    ];
+  try {
+    const messages = [systemPrompt];
 
     messages.push({
-        role: "user",
-        content:`${userQuery}`,
-    })
-
-  const totalAttemps = 5;
-  let count = 1;
-
-  while (true) {
-    if(count > totalAttemps){
-      return "I Could not find the result, please try again"
-    }
-    count++;
-
-    const responseFromLLM = await groq.chat.completions.create({
-      model: "openai/gpt-oss-20b",
-      temperature: 0,
-    //   stream:true,
-      messages,
-      tools: [
-        webSearchTool
-      ],
-      tool_choice:'auto'
+      role: "user",
+      content: `${userQuery}`,
     });
 
-    const toolCalls = responseFromLLM?.choices[0]?.message?.tool_calls;
+    const totalAttemps = 5;
+    let count = 1;
 
-    if (toolCalls?.length > 0) {
+    while (true) {
+      if (count > totalAttemps) {
+        let e = new Error("I Could not find the result, please try again");
+        e.statusCode = 404;
+        throw e;
+      }
+      count++;
 
-        messages.push(responseFromLLM.choices[0].message)
+      const responseFromLLM = await groq.chat.completions.create({
+        model: "openai/gpt-oss-120b",
+        temperature: 0,
+        messages,
+        tools: [webSearchTool],
+        tool_choice: "auto",
+      });
 
-        await toolCalling(toolCalls,messages);
+      const toolCalls = responseFromLLM?.choices[0]?.message?.tool_calls;
 
-    } else {
-      return responseFromLLM.choices[0].message.content
+      if (toolCalls?.length > 0) {
+        messages.push(responseFromLLM.choices[0].message);
+
+        await toolCalling(toolCalls, messages);
+      } else {
+        return responseFromLLM.choices[0].message.content;
+      }
     }
+  } catch (error) {
+    let wrappedError = new Error(
+      error.message || "AI service request failed",
+    );
+    wrappedError.statusCode = error.statusCode || error.status || 502;
+    throw wrappedError;
   }
 }
-
 
 module.exports = LLMCalling;
