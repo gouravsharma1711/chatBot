@@ -301,6 +301,9 @@ async function apiCaller(userMsg) {
       throw new Error("The server response did not contain a valid AI reply.");
     }
   } catch (error) {
+    console.log("ERROR :",error.message);
+    console.log("ERROR :",error);
+    
     throw new Error(`${error.message}`);
   }
 
